@@ -1,0 +1,716 @@
+<title>갸루 데코샵</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dongle:wght@400;700&family=Rampart+One&display=swap">
+<style>
+/* Layout: one-screen phone app — header, stage (flex), 5 groups, sub-chips, swipe item row, color row, action bar. Leopard desk behind a black deco-phone shell. Single dark theme by choice. */
+:root{
+  --shell:#1d1420; --shell2:#2b1d31; --line:#4a3550;
+  --pink:#ff4fa3; --baby:#ffc2e0; --silver:#ece8f4; --gold:#ffcf4a;
+  --leo:#e8b46a; --leo-d:#3b2a20; --leo-m:#c98f45; --tile:#fff6fb;
+  --f-ui:"Dongle","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-deco:"Rampart One","Arial Black",sans-serif;
+  color-scheme:dark;
+}
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  height:100%;margin:0;overflow:hidden;
+  background-color:var(--leo);
+  background-image:
+    radial-gradient(ellipse 7px 5px at 20% 25%,var(--leo-d) 55%,transparent 60%),
+    radial-gradient(ellipse 5px 7px at 70% 15%,var(--leo-d) 55%,transparent 60%),
+    radial-gradient(ellipse 6px 5px at 45% 65%,var(--leo-d) 55%,transparent 60%),
+    radial-gradient(ellipse 5px 6px at 85% 75%,var(--leo-d) 55%,transparent 60%),
+    radial-gradient(ellipse 9px 7px at 45% 65%,var(--leo-m) 60%,transparent 64%);
+  background-size:56px 56px;
+  color:var(--silver);font-family:var(--f-ui);font-size:22px;line-height:1;
+  padding-left:max(8px,env(safe-area-inset-left,0px));
+  padding-right:max(8px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px dashed var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+
+.app{height:100%;max-width:480px;margin:0 auto;padding-block:6px;display:flex;flex-direction:column}
+.shell{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;background:var(--shell);border:3px solid var(--pink);border-radius:22px;padding:7px;box-shadow:0 0 0 3px var(--shell),0 5px 0 3px var(--leo-d)}
+
+.top{display:flex;align-items:center;gap:6px;padding:0 2px}
+.logo{flex:1;min-width:0;display:flex;align-items:baseline;gap:6px;overflow:hidden}
+.logo b{font-size:28px;font-weight:700;color:var(--baby);white-space:nowrap}
+.logo span{font-family:var(--f-deco);font-size:11px;color:var(--gold);letter-spacing:.06em;white-space:nowrap}
+.mini{flex:0 0 auto;border:2px solid var(--line);border-radius:999px;padding:3px 9px 0;font-size:18px;color:var(--silver);white-space:nowrap}
+.mini[aria-pressed="true"]{border-color:var(--pink);background:var(--pink);color:#ffffff}
+
+.stage{flex:1;min-height:0;position:relative;border-radius:14px;overflow:hidden;background:#ffd1e6;border:2px solid var(--line)}
+#view{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges}
+.bob{animation:bob 1.2s steps(1) infinite}
+.dance{animation:dance .385s steps(1) infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+@keyframes dance{50%{transform:translateY(-5px) rotate(-1.5deg)}}
+.meter{position:absolute;left:7px;top:7px;background:var(--shell);border:2px solid var(--pink);border-radius:999px;padding:3px 9px 0;font-size:18px;color:var(--baby);display:flex;gap:5px;align-items:baseline}
+.meter b{font-family:var(--f-deco);font-weight:400;font-size:14px;color:var(--gold);font-variant-numeric:tabular-nums}
+.nailbox{position:absolute;right:7px;bottom:7px;width:92px;height:92px;background:var(--tile);border:2px solid var(--pink);border-radius:12px;display:grid;place-items:center}
+.nailbox canvas{width:84px;height:84px;image-rendering:pixelated}
+
+.groups{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.grp{background:var(--shell2);border-radius:9px;padding:5px 0 2px;font-size:20px;text-align:center;color:var(--silver)}
+.grp[aria-selected="true"]{background:var(--pink);color:#ffffff;font-weight:700}
+.scroll{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.scroll::-webkit-scrollbar{display:none}
+.sub{flex:0 0 auto;padding:4px 10px 1px;border-radius:999px;border:2px solid var(--line);font-size:18px;white-space:nowrap;color:var(--silver)}
+.sub[aria-pressed="true"]{border-color:var(--pink);color:#ffffff;background:var(--shell2)}
+.sub:last-child,.it:last-child,.dot:last-child,.chip:last-child{margin-right:24px}
+
+.cap{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:0 3px;font-size:20px}
+.cap b{color:var(--gold);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cap span{font-size:16px;color:var(--baby);white-space:nowrap}
+.items{padding-bottom:1px;scroll-snap-type:x proximity}
+.it{flex:0 0 auto;width:58px;height:58px;scroll-snap-align:start;background:var(--tile);border-radius:10px;border:2px solid transparent;display:grid;place-items:center;overflow:hidden;color:#8a5a7a;font-size:18px}
+.it canvas{width:90%;height:90%;object-fit:contain;image-rendering:pixelated}
+.it[aria-pressed="true"]{border-color:var(--pink);box-shadow:inset 0 0 0 2px var(--gold)}
+.it.empty{background:var(--shell2);color:var(--baby)}
+.sw{align-items:center;min-height:28px;padding:1px 0}
+.sw .lbl{flex:0 0 auto;font-size:16px;color:var(--baby);margin:0 1px 0 6px;white-space:nowrap}
+.sw .lbl:first-child{margin-left:0}
+.dot{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid var(--shell2);box-shadow:0 0 0 1px var(--line)}
+.dot[aria-pressed="true"]{box-shadow:0 0 0 2px var(--gold);border-color:var(--shell)}
+.chip{flex:0 0 auto;border-radius:999px;padding:3px 9px 0;font-size:17px;background:var(--shell2);color:var(--silver);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--shell);font-weight:700}
+
+.bar{display:grid;grid-template-columns:1fr 2.2fr;gap:6px}
+.btn{border-radius:14px;padding:7px 0 4px;font-size:23px;font-weight:700;background:var(--shell2);color:var(--silver);border:2px solid var(--line)}
+.btn.go{background:var(--pink);color:#ffffff;border-color:var(--gold);box-shadow:0 3px 0 #b02a6e}
+.btn:active{transform:translateY(2px)}
+
+.modal{position:fixed;inset:0;z-index:20;background:rgba(29,20,32,.74);display:grid;place-items:center;padding:12px max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px))}
+.card{width:min(420px,100%);max-height:100%;overflow:auto;background:var(--shell);border:3px solid var(--pink);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.rhead{text-align:center;font-size:26px;font-weight:700;color:var(--baby)}
+.rbody{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+.rbody img{height:min(32vh,220px);width:auto;max-width:40vw;border-radius:12px;border:2px solid var(--line);image-rendering:pixelated;display:block}
+.rinfo{display:flex;flex-direction:column;gap:5px;min-width:0}
+.grade{font-family:var(--f-deco);font-size:52px;color:var(--gold);line-height:.9}
+.rank{font-size:26px;font-weight:700;color:#ffffff;text-wrap:balance}
+.score{font-size:20px;color:var(--baby)}
+.score b{font-family:var(--f-deco);font-weight:400;font-size:22px;color:var(--pink);font-variant-numeric:tabular-nums}
+.stats{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.st{display:grid;grid-template-columns:2.6em minmax(0,1fr);gap:6px;align-items:center;font-size:18px}
+.track{height:9px;border-radius:9px;background:var(--shell2);overflow:hidden}
+.track i{display:block;height:100%;border-radius:9px;background:var(--pink);transition:width .6s}
+.st:nth-child(2) .track i{background:var(--gold)}
+.st:nth-child(3) .track i{background:var(--baby)}
+.st:nth-child(4) .track i{background:#c9b2ff}
+.cmt{margin:0;font-size:21px;color:#ffffff;line-height:1.05}
+.tip{margin:0;font-size:19px;color:var(--baby);line-height:1.05}
+.combos{display:flex;flex-wrap:wrap;gap:5px}
+.combos span{background:var(--gold);color:var(--shell);border-radius:999px;padding:3px 10px 1px;font-size:17px;font-weight:700}
+.hint{margin:0;font-size:16px;color:var(--silver);opacity:.75;text-align:center}
+
+@media (max-width:420px){.logo span{display:none}}
+@media (max-height:620px){.it{width:48px;height:48px}.logo b{font-size:24px}.btn{font-size:20px;padding:5px 0 2px}.nailbox{width:72px;height:72px}.nailbox canvas{width:64px;height:64px}}
+@media (prefers-reduced-motion:reduce){.bob,.dance{animation:none}.track i{transition:none}}
+</style>
+
+<div class="app">
+  <div class="shell">
+    <header class="top">
+      <div class="logo"><b>갸루 데코샵</b><span>GAL★DECO</span></div>
+      <button class="mini" id="bgm" aria-pressed="false">♫ BGM</button>
+      <button class="mini" id="snd" aria-pressed="true">효과음</button>
+    </header>
+    <div class="stage" id="stage">
+      <canvas id="view" width="80" height="150" class="bob" aria-label="꾸민 캐릭터"></canvas>
+      <div class="meter">갸루력 <b id="live">00</b></div>
+      <div class="nailbox" id="nailbox" hidden><canvas id="nailview" width="32" height="32"></canvas></div>
+    </div>
+    <nav class="groups" role="tablist" id="groups"></nav>
+    <div class="scroll" id="subs"></div>
+    <div class="cap"><b id="cap"></b><span id="capn"></span></div>
+    <div class="scroll items" id="items"></div>
+    <div class="scroll sw" id="sw"></div>
+    <div class="bar">
+      <button class="btn" id="rnd">랜덤</button>
+      <button class="btn go" id="done">완성! 갸루력 판정</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="rh">
+    <div class="rhead" id="rh">갸루력 판정 결과</div>
+    <div class="rbody">
+      <img id="shot" alt="완성한 갸루 코디">
+      <div class="rinfo">
+        <div class="grade" id="grade">S</div>
+        <div class="rank" id="rank"></div>
+        <div class="score">갸루력 <b id="score">0</b> / 100</div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+    <div class="combos" id="combos"></div>
+    <p class="cmt" id="cmt"></p>
+    <p class="tip" id="tip"></p>
+    <p class="hint">이미지를 길게 눌러 저장하거나 화면을 캡처해 공유해요</p>
+    <button class="btn go" id="again">다시 꾸미기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+const W=80,H=150,INK='#2a1830',WH='#ffffff',BK='#26232e';
+let X=null;
+function R(x,y,w,h,c){X.fillStyle=c;X.fillRect(x,y,w,h)}
+function RS(x,y,w,h,c){R(x,y,w,h,c);R(W-x-w,y,w,h,c)}
+function P(rows,x,y,m){rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){const k=m[r[i]];if(k)R(x+i,y+j,1,1,k)}})}
+function PS(rows,x,y,m){P(rows,x,y,m);P(rows.map(r=>[...r].reverse().join('')),W-x-rows[0].length,y,m)}
+function F(sp,fn){for(const [y0,y1,x0,x1] of sp)for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const c=typeof fn==='function'?fn(x,y):fn;if(c)R(x,y,1,1,c)}}
+const mir=sp=>sp.map(([a,b,c,d])=>[a,b,W-1-d,W-1-c]);
+const both=sp=>sp.concat(mir(sp));
+function wave(x,y0,y1,w,c,amp){for(let y=y0;y<=y1;y++)R(x+Math.round(Math.sin(y/4)*amp),y,w,1,c)}
+function waveS(x,y0,y1,w,c,amp){for(let y=y0;y<=y1;y++){const o=Math.round(Math.sin(y/4)*amp);R(x+o,y,w,1,c);R(W-x-w-o,y,w,1,c)}}
+function shade(h,a){const n=parseInt(h.slice(1),16),f=v=>Math.max(0,Math.min(255,v+a)).toString(16).padStart(2,'0');return '#'+f(n>>16)+f(n>>8&255)+f(n&255)}
+function lum(h){const n=parseInt(h.slice(1),16);return .299*(n>>16)+.587*(n>>8&255)+.114*(n&255)}
+const dk=c=>lum(c)<90?shade(c,45):shade(c,-48);
+const lt=c=>lum(c)<90?shade(c,70):shade(c,35);
+const ink2=c=>lum(c)>200?'#ff4fa3':WH;
+
+/* ---------- 팔레트 ---------- */
+const HAIRC=['#f2d27a','#efe2b8','#d9b48f','#a0683c','#5a3420','#22191a','#ff9ec7','#e0405a','#ff9a4d','#d6d6e6','#7fb0ff','#b99cff'];
+const HAIRB=['1100','1100','0110','0010','0010','0001','1020','0102','0101','1002','1001','0120'];
+const SKIN=['#fff3ea','#ffe6d6','#f6d0b0','#e8b890','#d9a07a','#c08860','#a8714f','#8a5a3c','#6a4028'];
+const LENS=['#6b3a2a','#3b2a20','#8a8a9a','#5f8fd6','#ff6fae','#9a7ad6','#3f9a7f','#c08a3e'];
+const LIP=['#ff5a8a','#e0607e','#c0304f','#ff8fb1','#d97a6a','#ffffff','#9a3a6a','#ff9a6a'];
+const CL=['#26232e','#ffffff','#ff4fa3','#ffb3d4','#e8b46a','#ffcf4a','#2f3a6b','#8c8a96','#b99cff','#7fd0ff','#ff3b4f','#5a7fb8','#9fe3c9','#7a4a2a'];
+const MET=['#ffcf4a','#e6e6f0','#ff8fc1','#fff8ee','#26232e','#7fd0ff'];
+const NAILC=['#ff4fa3','#ffb3d4','#ffffff','#26232e','#e8b46a','#ff3b4f','#7fd0ff','#b99cff','#ffcf4a','#9fe3c9'];
+const NAILART=['단색','프렌치','그라데','글리터','하트'];
+const ARTB=['0000','0110','1100','2000','1010'];
+
+/* ---------- 패턴 ---------- */
+function leo(x,y,c){const a=(x*7+((y>>2)*3))%9,b=y&3;if((a===0&&b<2)||(a===1&&b===1))return '#3b2a20';if(a===2&&b===0)return shade(c,-35);return null}
+const PAT={
+ leo:c=>(x,y)=>leo(x,y,c)||c,
+ zebra:c=>(x,y)=>(((x+(y>>1))%6)<2)?'#1d1a22':c,
+ heart:c=>(x,y)=>{const a=x%6,b=y%6;return ((b===1&&(a===1||a===3))||(b===2&&a>=1&&a<=3)||(b===3&&a===2))?ink2(c):c},
+ check:c=>(x,y)=>(x%6===2||y%4===1)?dk(c):(x%6===5)?'#d93a5a':c,
+ denim:c=>(x,y)=>((x*3+y*5)%11===0)?lt(c):c,
+ velvet:c=>(x,y)=>((x+y)%9===0)?lt(c):c,
+ gingham:c=>(x,y)=>{const a=(x>>1)&1,b=(y>>1)&1;return a&&b?dk(c):(a||b)?c:WH},
+ glitter:c=>(x,y)=>((x*7+y*3)%11===0)?WH:((x+y*2)%5===0)?lt(c):c,
+ lace:c=>(x,y)=>((x+y)&1)?c:lt(c),
+ rib:c=>(x)=>(x%3===0)?shade(c,lum(c)<90?20:-18):c
+};
+
+/* ---------- 체형 ---------- */
+const BODY=[
+ {n:'기본',s:'0010',ch:11,mh:10,wh:8,hh:9,tw:7,dL:0},
+ {n:'슬림',s:'0101',ch:10,mh:9,wh:7,hh:8,tw:6,dL:2},
+ {n:'글래머',s:'0300',ch:12,mh:10,wh:7,hh:11,tw:8,dL:0},
+ {n:'모델 키',s:'0201',ch:11,mh:10,wh:8,hh:9,tw:7,dL:6},
+ {n:'아담',s:'0030',ch:10,mh:9,wh:8,hh:9,tw:7,dL:-8},
+ {n:'통통',s:'0120',ch:12,mh:12,wh:11,hh:11,tw:8,dL:-2}
+];
+function geom(B){const G={B,tor:{},leg:{}};
+ for(let y=46;y<=77;y++)G.tor[y]=y===46?B.ch-2:y<=54?B.ch:y<=60?B.mh:y<=66?Math.round((B.mh+B.wh)/2):y<=70?B.wh:B.hh;
+ G.au=40-B.ch-4;G.hlx=G.au-2;G.hrx=W-G.hlx-5;
+ const a=Math.round(B.dL/2),b=B.dL-a,tw=B.tw;
+ const thE=99+a,knE=thE+6,caE=knE+10+b,loE=caE+8,anE=loE+6;
+ for(let y=78;y<=anE;y++){let x0;if(y<=thE)x0=y<=81?Math.min(39-tw,41-B.hh):39-tw;else if(y<=knE)x0=40-tw;else if(y<=caE)x0=39-tw;else if(y<=loE)x0=40-tw;else x0=41-tw;G.leg[y]=[x0,y>loE?37:38]}
+ G.knee=thE+1;G.calf=knE+1;G.ank=loE+1;G.fy=anE+1;G.fx0=38-tw;return G}
+function torsoF(G,y0,y1,fn,e){e=e||0;for(let y=y0;y<=y1;y++){const h=G.tor[y];if(h==null)continue;for(let x=40-h-e;x<=39+h+e;x++){const c=fn(x,y);if(c)R(x,y,1,1,c)}}}
+function skirtF(G,y0,y1,fl,fn,h0){h0=h0==null?G.B.hh+1:h0;for(let y=y0;y<=y1;y++){const h=h0+Math.floor((y-y0)*fl);for(let x=40-h;x<=39+h;x++){const c=fn(x,y);if(c)R(x,y,1,1,c)}}}
+function legF(G,y0,y1,fn,ex){for(let y=y0;y<=y1;y++){const r=G.leg[y];let x0,x1;if(r){x0=r[0];x1=r[1]}else if(y>=G.fy){x0=G.fx0;x1=38}else continue;const e=typeof ex==='function'?ex(y):(ex||0);for(let x=x0-e;x<=x1;x++){const c=typeof fn==='function'?fn(x,y):fn;if(c){R(x,y,1,1,c);R(W-1-x,y,1,1,c)}}}}
+function sleeves(G,kind,fn,cuff){const a=G.au;
+ const sp={long:[[47,66,a,a+3],[67,81,a-1,a+2]],short:[[47,55,a-1,a+3]],puff:[[46,46,a+1,a+3],[47,52,a-1,a+4]],bell:[[47,66,a,a+3],[67,75,a-1,a+2],[76,84,a-3,a+2]],off:[[53,81,a-1,a+3]]}[kind]||[];
+ F(both(sp),fn);if(cuff){const cs=kind==='long'?[[82,84,a-1,a+2]]:kind==='off'?[[82,84,a-1,a+3]]:[];F(both(cs),cuff)}}
+
+/* ---------- 얼굴 ---------- */
+const FACES=[
+ {n:'계란형',s:'0110',r:[[18,8],[19,36,10],[37,9],[38,8],[39,7],[40,5]]},
+ {n:'둥근형',s:'0030',r:[[18,8],[19,38,10],[39,9],[40,7],[41,4]]},
+ {n:'V라인',s:'0210',r:[[18,8],[19,32,10],[33,34,9],[35,8],[36,7],[37,6],[38,5],[39,4],[40,2]]},
+ {n:'각진형',s:'0102',r:[[18,9],[19,38,10],[39,9],[40,8]]},
+ {n:'하트형',s:'0120',r:[[18,9],[19,28,11],[29,32,10],[33,34,9],[35,8],[36,7],[37,6],[38,5],[39,3]]},
+ {n:'긴 얼굴',s:'0201',r:[[18,7],[19,37,9],[38,8],[39,7],[40,6],[41,4]]},
+ {n:'동안형',s:'0030',r:[[18,8],[19,35,10],[36,9],[37,8],[38,6],[39,4]]}
+];
+function faceRows(spec){const m={};spec.forEach(a=>{if(a.length===2)m[a[0]]=a[1];else for(let y=a[0];y<=a[1];y++)m[y]=a[2]});return m}
+const BIG=['K.KKKKK','KKKKKKK','.KWHIIW','..WIDIW','..KIIK.','.N.NNN.'];
+const EYES=[
+ {n:'기본',s:'0010',y:26,r:['..KKKK.','.KWHIW.','..WIDW.','...LL..']},
+ {n:'큰 갸루눈',s:'1210',y:25,r:BIG},
+ {n:'처진눈',s:'0120',y:25,r:['...KKKK','..KWHIW','.KKWIDW','KK.WIIW','....KK.']},
+ {n:'고양이눈',s:'1102',y:25,r:['KK.....','.KKKKKK','..WHIDK','..WIIW.','...LL..']},
+ {n:'동그란 눈',s:'0030',y:25,r:['..KKK..','.KWHIK.','.KWIDK.','.KWIIK.','..KKK..']},
+ {n:'졸린 눈',s:'0011',y:26,r:['.......','.KKKKK.','.KWIDW.','..LLL..']},
+ {n:'반짝 눈',s:'2110',y:25,r:['K.KKKKK','KKKKKKK','.KWHIIW','..WIHIW','..KIIK.','.N.NNN.']},
+ {n:'하트 눈',s:'1120',y:25,r:BIG,map:{H:'#ffffff',I:'#ff6fae',D:'#ff2f8a'}},
+ {n:'웃는 눈',s:'0030',y:26,r:['.......','..KKK..','.K...K.','.......']},
+ {n:'윙크',s:'1121',y:25,r:BIG,wink:1},
+ {n:'외꺼풀',s:'0101',y:26,r:['.KKKKK.','.WIDIW.','..LLL..']},
+ {n:'시크 반눈',s:'0102',y:26,r:['KKKKKKK','.KWIDW.','..WIIW.','...LL..']},
+ {n:'속눈썹 폭탄',s:'2200',y:25,r:['K.K.K.K','KKKKKKK','KKWHIIW','.KWIDIW','..KIIK.','.K.K.K.']},
+ {n:'올망 아이',s:'0130',y:25,r:['..KKKK.','.KKKKKK','.KWHIIW','.KWIHIW','.KWIIIW','..KKKK.']}
+];
+const BROWS=[
+ {n:'아치',s:'0110',y:22,r:['..BBBB.','BB.....']},
+ {n:'일자',s:'0010',y:23,r:['BBBBBB.']},
+ {n:'얇은 갸루',s:'1100',y:21,r:['...BBB.','.BB....','B......']},
+ {n:'두꺼운',s:'0011',y:22,r:['.BBBBB.','BBBBBB.']},
+ {n:'처진',s:'0020',y:22,r:['....BBB','BBBB...']},
+ {n:'올라간',s:'0002',y:22,r:['BB.....','..BBBBB']},
+ {n:'탈색',s:'1101',y:22,r:['..BBBB.','BB.....'],bleach:1}
+];
+const NOSES=[
+ {n:'점코',s:'0010',y:34,r:['..s.']},
+ {n:'작은 코',s:'0010',y:33,r:['..s.','.s..']},
+ {n:'오똑 코',s:'0101',y:30,r:['..h.','..h.','..h.','..s.','.ss.']},
+ {n:'콧구멍',s:'0001',y:33,r:['.hh.','s..s']},
+ {n:'하이라이트',s:'1000',y:31,r:['.h..','.h..','.h..','..s.']},
+ {n:'둥근 코',s:'0020',y:33,r:['.ss.','s..s']},
+ {n:'없음',s:'0010',y:34,r:['....']}
+];
+const MOUTHS=[
+ {n:'미소',s:'0020',y:37,r:['..LLLL..','...ll...']},
+ {n:'활짝',s:'1020',y:36,r:['..LLLL..','..TTTT..','..DUUD..','...LL...']},
+ {n:'메롱',s:'0111',y:36,r:['..LLLL..','..DDDD..','...UU...','...UU...']},
+ {n:'고양이 입',s:'0030',y:37,r:['.K.KK.K.','..K..K..']},
+ {n:'도톰 입술',s:'0210',y:36,r:['..LllL..','..LLLL..','...LL...']},
+ {n:'쪽',s:'0120',y:36,r:['...LL...','..L..L..','...LL...']},
+ {n:'놀람',s:'0011',y:36,r:['...KK...','..KDDK..','..KDDK..','...KK...']},
+ {n:'무표정',s:'0001',y:37,r:['..LLLL..']},
+ {n:'앙',s:'0011',y:37,r:['...LL...']},
+ {n:'스머크',s:'0102',y:36,r:['......L.','..LLLL..']},
+ {n:'헤헤',s:'0021',y:36,r:['..KKKK..','..DUUD..','...DD...']}
+];
+const MAKEUP=[
+ {n:'노메이크',s:'0000'},
+ {n:'내추럴',s:'0010',pre(){RS(31,32,4,1,'#ffb8c8')}},
+ {n:'갸루',s:'1210',pre(){RS(30,32,5,2,'#ff9eb8')},post(){PS(['.N.NNN.'],31,31,{N:'#fff4f8'})}},
+ {n:'강구로',s:'1203',lip:WH,pre(){PS(['.EEEEE.'],31,24,{E:WH})},post(){PS(['.EEEE..','..EE...'],31,31,{E:WH});R(40,29,1,4,WH)}},
+ {n:'핑크 섀도',s:'0120',pre(){PS(['.SSSSS.'],31,24,{S:'#ff9ec7'});RS(30,32,5,2,'#ff9eb8')}},
+ {n:'블루 섀도',s:'1101',pre(){PS(['.SSSSS.','S......'],31,23,{S:'#7fb0ff'})}},
+ {n:'하트 스티커',s:'1120',pre(){RS(30,32,5,2,'#ffb0c8')},post(){P(['X.X','XXX','.X.'],45,32,{X:'#ff4fa3'})}},
+ {n:'반짝이 볼',s:'2010',post(){[[31,32],[33,33],[32,34]].forEach(([x,y])=>RS(x,y,1,1,WH));RS(30,33,1,1,'#ffcf4a')}},
+ {n:'주근깨',s:'0011',post(g){[[32,33],[34,32],[33,34],[35,34]].forEach(([x,y])=>RS(x,y,1,1,g.sd))}},
+ {n:'애교점',s:'0102',post(){R(46,32,1,1,INK)}},
+ {n:'별 스티커',s:'2010',post(){P(['.X.','XXX','.X.'],32,32,{X:'#ffcf4a'})}},
+ {n:'글리터 아이',s:'2100',pre(){PS(['.S.S.S.'],31,24,{S:WH});PS(['S.S.S..'],31,31,{S:'#ffcf4a'})}}
+];
+const SKINS=['아이보리','핑크빛','밝은 피부','베이지','태닝','건강한 태닝','갈색 태닝','진한 태닝','강구로 블랙'].map((n,i)=>({n,s:['0020','0020','0010','0000','0101','0101','0102','0103','0203'][i]}));
+
+/* ---------- 헤어 ---------- */
+function crown(g){R(34,10,12,1,g.hc);R(31,11,18,1,g.hc);R(29,12,22,2,g.hc);R(28,14,24,4,g.hc);R(33,12,6,1,g.hh);R(30,14,3,1,g.hh)}
+const HAIRS=[
+ {n:'롱 웨이브',s:'1210',b(g){R(28,14,24,30,g.hd);waveS(22,18,100,9,g.hd,1.6)},f(g){waveS(26,18,90,5,g.hc,1.4);waveS(27,24,86,1,g.hh,1.4)}},
+ {n:'롱 스트레이트',s:'0120',b(g){R(26,14,28,10,g.hd);RS(23,20,8,74,g.hd)},f(g){RS(26,18,4,72,g.hc);RS(27,24,1,60,g.hh)}},
+ {n:'히메컷',s:'0220',b(g){R(26,14,28,10,g.hd);RS(23,20,8,70,g.hd)},f(g){RS(26,18,5,22,g.hc);RS(26,39,5,1,g.hd);RS(24,42,5,44,g.hc);RS(26,44,1,38,g.hh)}},
+ {n:'하이 포니',s:'1102',b(g){R(28,14,24,12,g.hd);wave(52,8,72,8,g.hc,2);wave(56,12,68,1,g.hd,2);wave(53,10,60,1,g.hh,2)},f(g){R(36,9,10,1,g.hc);waveS(28,20,44,2,g.hc,1);R(48,9,5,4,'#ff4fa3');R(49,10,3,2,'#ffb3d4')}},
+ {n:'사이드 포니',s:'1111',b(g){R(28,14,24,12,g.hd)},f(g){R(28,18,3,10,g.hc);R(48,18,4,14,g.hc);wave(47,33,84,7,g.hc,1.5);wave(49,36,80,1,g.hh,1.5);R(47,30,5,4,'#ff4fa3')}},
+ {n:'양갈래 컬',s:'1030',b(g){R(28,14,24,12,g.hd)},f(g){RS(28,18,2,12,g.hc);waveS(15,16,70,8,g.hc,2);waveS(17,20,66,1,g.hd,2);waveS(16,18,60,1,g.hh,2);RS(14,66,9,5,g.hc);RS(16,70,5,2,g.hc);RS(23,14,5,5,'#ff4fa3');RS(24,15,3,3,'#ffb3d4')}},
+ {n:'낮은 양갈래',s:'0130',b(g){R(28,14,24,12,g.hd)},f(g){RS(27,18,4,14,g.hc);RS(25,35,5,40,g.hc);RS(26,37,1,34,g.hh);RS(26,75,3,2,g.hc);RS(26,32,4,3,'#ff4fa3')}},
+ {n:'모리 업',s:'1300',b(g){R(28,14,24,12,g.hd)},f(g){R(33,0,14,1,g.hc);R(31,1,18,2,g.hc);R(29,3,22,6,g.hc);R(30,9,20,2,g.hc);R(33,2,6,1,g.hh);R(31,4,2,3,g.hh);[36,42].forEach(x=>R(x,3,1,6,g.hd));waveS(28,20,52,2,g.hc,1.2)}},
+ {n:'오당고',s:'0130',b(g){R(28,14,24,12,g.hd)},f(g){RS(25,4,10,8,g.hc);RS(26,3,8,1,g.hc);RS(27,5,3,1,g.hh);RS(28,8,6,1,g.hd);RS(28,18,2,10,g.hc)}},
+ {n:'볼륨 보브',s:'0111',b(g){R(26,14,28,14,g.hd);RS(24,18,8,26,g.hd)},f(g){RS(26,18,5,24,g.hc);RS(23,40,6,3,g.hc);RS(27,22,1,16,g.hh)}},
+ {n:'숏컷',s:'0102',b(){},f(g){RS(28,15,3,10,g.hc)}},
+ {n:'반묶음',s:'0220',b(g){R(26,14,28,10,g.hd);waveS(23,20,92,8,g.hd,1.2)},f(g){R(35,5,10,6,g.hc);R(36,4,8,1,g.hc);R(37,6,3,1,g.hh);R(34,10,12,1,'#ff4fa3');waveS(26,18,84,4,g.hc,1.2)}},
+ {n:'땋은 머리',s:'0130',b(g){R(28,14,24,12,g.hd)},f(g){RS(27,18,3,14,g.hc);for(let y=32;y<80;y++){RS(25+((y>>1)&1),y,4,1,((y>>1)%2)?g.hc:g.hd)}RS(25,80,4,3,'#ff4fa3');RS(26,83,2,3,g.hc)}},
+ {n:'레이어드',s:'0111',b(g){R(26,14,28,12,g.hd);RS(24,18,8,40,g.hd)},f(g){waveS(26,18,56,4,g.hc,1);RS(23,55,5,2,g.hc);RS(27,24,1,26,g.hh)}},
+ {n:'초롱 롱헤어',s:'1300',b(g){R(26,14,28,10,g.hd);waveS(20,18,124,10,g.hd,1.8)},f(g){waveS(25,18,118,5,g.hc,1.6);waveS(26,26,110,1,g.hh,1.6)}},
+ {n:'사이드 업',s:'1201',b(g){R(28,14,24,12,g.hd);wave(50,12,64,9,g.hc,2);wave(54,16,60,1,g.hh,2)},f(g){R(47,11,5,4,'#ffcf4a');waveS(28,20,40,2,g.hc,1)}}
+];
+const BANGS=[
+ {n:'사이드 스윕',s:'0110',d(g){R(29,18,22,2,g.hc);R(29,20,10,2,g.hc);R(29,22,6,2,g.hc);R(44,20,6,2,g.hc);R(47,22,3,2,g.hc);R(34,19,1,3,g.hd);R(46,19,1,2,g.hd);R(31,18,5,1,g.hh)}},
+ {n:'일자 뱅',s:'0120',d(g){R(29,18,22,5,g.hc);[32,36,40,44,47].forEach(x=>R(x,19,1,3,g.hd));R(31,18,4,1,g.hh)}},
+ {n:'시스루 뱅',s:'0120',d(g){R(29,18,22,2,g.hc);for(let x=30;x<50;x+=2)R(x,20,1,3,g.hc);R(31,18,4,1,g.hh)}},
+ {n:'M자 앞머리',s:'0111',d(g){R(29,18,22,2,g.hc);RS(29,20,8,2,g.hc);RS(29,22,4,3,g.hc);RS(33,19,1,3,g.hd)}},
+ {n:'5:5 가르마',s:'0101',d(g){R(39,11,2,7,g.hd);RS(29,18,5,5,g.hc);RS(29,23,3,3,g.hc)}},
+ {n:'올백',s:'0102',d(g){R(31,17,18,1,g.hd)}},
+ {n:'긴 옆머리',s:'1110',d(g){R(29,18,22,2,g.hc);R(29,20,9,3,g.hc);R(29,23,6,4,g.hc);R(29,27,3,4,g.hc);R(44,20,6,2,g.hc);R(33,20,1,6,g.hd);R(31,18,5,1,g.hh)}},
+ {n:'짧은 일자',s:'0021',d(g){R(29,18,22,3,g.hc);[33,38,43].forEach(x=>R(x,19,1,2,g.hd))}},
+ {n:'지그재그',s:'1011',d(g){R(29,18,22,3,g.hc);for(let x=29;x<50;x+=4)R(x,21,2,2,g.hc)}},
+ {n:'컬 앞머리',s:'1120',d(g){R(29,18,22,2,g.hc);P(['XX..XX..XX..XX..XX..XX','.XX..XX..XX..XX..XX..X'],29,20,{X:g.hc});R(31,18,6,1,g.hh)}}
+];
+
+/* ---------- 상의 ---------- */
+const TOPS=[
+ {n:'카디건 교복',s:'0120',d(G,c){const d=dk(c),a=G.au;torsoF(G,46,71,(x,y)=>(x===40&&y>51)||y===71?d:c);sleeves(G,'long',c,d);RS(a+3,48,1,17,d);R(37,46,6,2,WH);RS(35,46,2,2,WH);R(39,50,2,2,WH);R(38,48,4,2,'#d93a5a');R(39,50,2,3,'#b02a48');[55,59,63,67].forEach(y=>R(41,y,1,1,lt(c)))}},
+ {n:'니트 베스트',s:'0121',d(G,c){const d=dk(c),a=G.au;torsoF(G,46,71,()=>WH);F(both([[47,66,a,a+3],[67,78,a-1,a+2]]),WH);RS(a+3,48,1,17,'#e4e0ea');F(both([[79,81,a-1,a+2]]),'#e4e0ea');torsoF(G,50,71,(x,y)=>(y<55&&Math.abs(x-39.5)<(55-y))?null:(y>=70?d:c));RS(35,46,3,2,WH);R(38,46,4,2,'#d93a5a');R(39,48,2,7,'#d93a5a');R(39,55,2,1,'#b02a48')}},
+ {n:'세일러 교복',s:'0130',d(G,c){const d=dk(c),a=G.au;torsoF(G,46,71,(x,y)=>y>=70?d:c);sleeves(G,'long',c,'#2f3a6b');RS(a+3,48,1,17,d);torsoF(G,46,52,(x,y)=>Math.abs(x-39.5)<(52-y)*.5+.5?WH:(y===50?WH:'#2f3a6b'));R(37,52,6,2,'#d93a5a');R(38,54,4,2,'#d93a5a');R(39,56,2,3,'#b02a48')}},
+ {n:'오프숄더 니트',s:'0211',d(G,c){const d=dk(c);torsoF(G,52,54,()=>d,1);torsoF(G,55,72,PAT.rib(c),1);sleeves(G,'off',PAT.rib(c),d)}},
+ {n:'퍼 볼레로',s:'2301',d(G,c){const fu='#fff4f8',fd='#ead0dc',a=G.au,fz=(x,y)=>(x+y)%5===0?fd:fu;torsoF(G,53,61,(x,y)=>y===53?lt(c):y===61?dk(c):c);F(both([[46,57,a-1,a+5]]),fz);torsoF(G,46,48,fz);[0,2,4,6].forEach(i=>RS(a-1+i,58+(i%4?1:0),1,1,fu));R(39,66,2,1,'#bfe8ff')}},
+ {n:'레오파드 크롭',s:'1203',d(G,c){RS(33,47,1,6,BK);torsoF(G,53,63,(x,y)=>y===53?lt(c):PAT.leo(c)(x,y))}},
+ {n:'벨벳 츄리닝',s:'2111',d(G,c){const d=dk(c),a=G.au;F([[42,46,32,47]],d);torsoF(G,46,71,(x,y)=>y>=69?d:PAT.velvet(c)(x,y));sleeves(G,'long',PAT.velvet(c),d);RS(a+3,48,1,17,d);R(40,47,1,22,'#dcdce8');R(39,47,3,2,'#dcdce8');P(['X.X','XXX','.X.'],32,52,{X:WH});P(['X.X','XXX','.X.'],44,56,{X:WH})}},
+ {n:'하트 베이비티',s:'0130',d(G,c){const d=dk(c);torsoF(G,46,64,(x,y)=>y===64?d:c);sleeves(G,'short',c);R(37,46,6,1,d);P(['.XX.XX.','XXXXXXX','XXXXXXX','.XXXXX.','..XXX..','...X...'],36,51,{X:ink2(c)})}},
+ {n:'홀터넥',s:'2101',d(G,c){RS(36,44,1,4,c);torsoF(G,48,64,(x,y)=>(y<56&&Math.abs(x-39.5)>(y-45))?null:PAT.glitter(c)(x,y))}},
+ {n:'지브라 탱크',s:'0202',d(G,c){RS(33,47,2,5,BK);torsoF(G,52,70,PAT.zebra(c))}},
+ {n:'시스루 블라우스',s:'0130',d(G,c){torsoF(G,46,70,PAT.lace(c));sleeves(G,'bell',PAT.lace(c));R(36,46,8,2,WH);R(38,48,4,2,'#ff4fa3');R(39,50,2,2,'#e0308a')}},
+ {n:'데님 재킷',s:'0112',d(G,c){const d=dk(c),a=G.au;torsoF(G,52,62,()=>WH);torsoF(G,46,68,(x,y)=>(x>=36&&x<=43&&y>=48)?null:PAT.denim(c)(x,y));R(35,46,2,8,d);R(43,46,2,8,d);sleeves(G,'long',PAT.denim(c),d);RS(a+3,48,1,17,d);RS(33,58,1,1,'#ffcf4a');RS(33,64,1,1,'#ffcf4a')}},
+ {n:'터틀넥',s:'0111',d(G,c){const d=dk(c),a=G.au;R(36,41,8,6,c);R(36,41,8,1,d);torsoF(G,46,71,PAT.rib(c));sleeves(G,'long',PAT.rib(c),d);RS(a+3,48,1,17,d)}},
+ {n:'체크 셔츠 묶음',s:'0121',d(G,c){torsoF(G,46,60,PAT.gingham(c));sleeves(G,'short',PAT.gingham(c));R(36,61,8,3,dk(c));R(34,64,3,3,c);R(43,64,3,3,c);RS(35,46,3,2,lt(c))}},
+ {n:'시퀸 튜브탑',s:'3100',d(G,c){torsoF(G,53,62,PAT.glitter(c))}},
+ {n:'미니 원피스',s:'0230',one:1,d(G,c){const d=dk(c);torsoF(G,46,71,(x,y)=>y===70?d:c);sleeves(G,'puff',c);R(36,46,8,2,WH);skirtF(G,72,90,.55,(x,y)=>y>=89?WH:c)}},
+ {n:'슬립 드레스',s:'1201',one:1,d(G,c){RS(33,47,1,6,c);torsoF(G,52,71,(x)=>(x===35||x===44)?lt(c):c);skirtF(G,72,96,.25,(x,y)=>y>=95?(((x+y)&1)?WH:lt(c)):c,G.B.hh)}},
+ {n:'레오파드 원피스',s:'1303',one:1,d(G,c){RS(33,47,1,4,BK);torsoF(G,50,71,PAT.leo(c));skirtF(G,72,86,.12,PAT.leo(c),G.B.hh)}}
+];
+
+/* ---------- 하의 ---------- */
+const BOTTOMS=[
+ {n:'플리츠 미니',s:'0120',d(G,c){const d=dk(c);skirtF(G,70,72,0,()=>d);skirtF(G,73,83,.5,(x)=>((x-31)%3===0)?d:c)}},
+ {n:'체크 미니',s:'0120',d(G,c){skirtF(G,70,72,0,()=>dk(c));skirtF(G,73,83,.5,PAT.check(c))}},
+ {n:'데님 마이크로',s:'0202',d(G,c){const d=dk(c);skirtF(G,70,79,.1,(x,y)=>y===79?d:PAT.denim(c)(x,y),G.B.hh);skirtF(G,70,71,0,(x)=>x%3===0?'#e8e8f0':BK,G.B.hh)}},
+ {n:'레오파드 미니',s:'1203',d(G,c){skirtF(G,70,71,0,()=>BK,G.B.hh);skirtF(G,72,81,.25,PAT.leo(c),G.B.hh)}},
+ {n:'프릴 미니',s:'1030',d(G,c){skirtF(G,70,72,0,()=>dk(c));skirtF(G,73,79,.4,(x,y)=>y>=78?WH:c);skirtF(G,80,86,.4,(x,y)=>y>=85?(((x+y)&1)?WH:'#f3dbe8'):c,G.B.hh+4)}},
+ {n:'테니스 스커트',s:'0121',d(G,c){skirtF(G,70,81,.6,(x,y)=>(y===79||y===80)?'#2f3a6b':((x-30)%4===0)?dk(c):c)}},
+ {n:'롱 스커트',s:'0210',d(G,c){skirtF(G,70,120,.28,(x,y)=>((x-30)%5===0&&y>75)?dk(c):c)}},
+ {n:'지브라 미니',s:'0202',d(G,c){skirtF(G,70,80,.2,PAT.zebra(c),G.B.hh)}},
+ {n:'하트 미니',s:'0130',d(G,c){skirtF(G,70,71,0,()=>dk(c));skirtF(G,72,82,.45,PAT.heart(c))}},
+ {n:'플레어 진',s:'1201',d(G,c){const d=dk(c);torsoF(G,71,77,(x,y)=>y===71?BK:c);legF(G,78,G.fy+2,(x,y)=>x===35?d:(x===33&&y>80&&y<96)?lt(c):c,(y)=>y<G.calf?0:Math.min(3,1+((y-G.calf)/7|0)))}},
+ {n:'데님 숏츠',s:'0111',d(G,c){torsoF(G,70,77,(x,y)=>y<=71?BK:PAT.denim(c)(x,y));legF(G,78,85,(x,y)=>y===85?lt(c):PAT.denim(c)(x,y),1)}},
+ {n:'카고 팬츠',s:'0102',d(G,c){const d=dk(c);torsoF(G,70,77,(x,y)=>y===70?d:c);legF(G,78,G.fy+1,(x,y)=>(y>=90&&y<=97&&x>=G.fx0-1&&x<=G.fx0+2)?d:c,2)}},
+ {n:'츄리닝 바지',s:'1111',d(G,c){torsoF(G,70,77,(x,y)=>y<=71?dk(c):PAT.velvet(c)(x,y));legF(G,78,G.fy+1,(x,y)=>{const r=G.leg[y];return (r&&x===r[0]-1)?WH:PAT.velvet(c)(x,y)},1)}},
+ {n:'핫팬츠',s:'0302',d(G,c){torsoF(G,70,77,(x,y)=>y===70?BK:c);legF(G,78,80,c)}}
+];
+
+/* ---------- 양말 / 신발 ---------- */
+const SOCKS=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'루즈삭스',s:'1220',d(G,c){legF(G,G.calf-2,G.fy+1,(x,y)=>(y%4===0||y===G.calf-2)?shade(c,lum(c)>200?-26:30):c,(y)=>((y>>1)%3===0)?2:1)}},
+ {n:'크루삭스',s:'0110',d(G,c){legF(G,G.ank-4,G.fy+1,(x,y)=>y<=G.ank-3?dk(c):c)}},
+ {n:'니삭스',s:'0120',d(G,c){legF(G,G.knee+7,G.fy+1,(x,y)=>y<=G.knee+8?dk(c):c)}},
+ {n:'오버니',s:'0211',d(G,c){legF(G,86,G.fy+1,(x,y)=>y<=87?dk(c):c)}},
+ {n:'망사 스타킹',s:'0203',d(G,c){legF(G,78,G.fy+3,(x,y)=>((x+y)%3===0||(x-y+300)%3===0)?c:null)}},
+ {n:'프릴 삭스',s:'0130',d(G,c){legF(G,G.ank-2,G.fy+1,c);legF(G,G.ank-4,G.ank-3,(x,y)=>((x+y)&1)?WH:'#f3dbe8',1)}},
+ {n:'레그워머',s:'0211',d(G,c){legF(G,G.calf,G.fy+1,(x,y)=>(y%3===0)?dk(c):c,(y)=>((y>>2)%2)?2:1)}},
+ {n:'줄무늬 니삭스',s:'0121',d(G,c){legF(G,G.knee+7,G.fy+1,(x,y)=>((y>>1)%2)?c:WH)}}
+];
+const SHOES=[
+ {n:'로퍼',s:'0110',d(G,c){const f=G.fy;F(both([[f,f+4,G.fx0-1,38]]),(x,y)=>y===f+4?shade(c,-30):(y===f+1&&x>=G.fx0+1&&x<=G.fx0+5)?dk(c):c)}},
+ {n:'통굽 부츠',s:'1203',d(G,c){const f=G.fy;legF(G,G.knee-2,f-1,(x,y)=>(x===G.fx0+4&&y%3===0&&y<f-3)?WH:y<=G.knee-1?dk(c):c,1);F(both([[f,f+3,G.fx0-1,38]]),c);F(both([[f+4,f+7,G.fx0-1,38]]),(x,y)=>y===f+5?lt(c):dk(c))}},
+ {n:'어그 부츠',s:'0220',d(G,c){const f=G.fy;legF(G,G.calf+2,f+2,c,1);legF(G,G.calf-1,G.calf+1,(x,y)=>((x+y)&1)?'#f6eadc':'#e6d4bf',2);F(both([[f+3,f+5,G.fx0-1,38]]),dk(c))}},
+ {n:'통굽 샌들',s:'2201',d(G,c){const f=G.fy;legF(G,G.ank,G.ank+1,c);F(both([[f+1,f+1,G.fx0,38]]),c);F(both([[f+4,f+7,G.fx0,38]]),(x,y)=>y===f+5?lt(c):c)}},
+ {n:'메리제인',s:'0130',d(G,c){const f=G.fy;F(both([[f,f,G.fx0+1,37]]),c);F(both([[f+1,f+4,G.fx0-1,38]]),(x,y)=>y===f+4?dk(c):c)}},
+ {n:'하이힐',s:'1201',d(G,c){const f=G.fy;F(both([[f+1,f+3,G.fx0-1,38]]),c);F(both([[f+3,f+3,G.fx0-2,G.fx0]]),c);F(both([[f+4,f+6,37,38]]),dk(c))}},
+ {n:'청키 운동화',s:'0211',d(G,c){const f=G.fy;F(both([[f-1,f+4,G.fx0-1,38]]),(x,y)=>(y===f&&(x===G.fx0+2||x===G.fx0+4))?WH:c);F(both([[f+5,f+6,G.fx0-1,38]]),WH)}},
+ {n:'싸이하이 부츠',s:'0303',d(G,c){const f=G.fy;legF(G,84,f+3,(x,y)=>y<=85?dk(c):(x===G.fx0+3&&y>90&&y<f)?lt(c):c,1);F(both([[f+4,f+6,37,38]]),dk(c))}},
+ {n:'퍼 슬리퍼',s:'0130',d(G,c){const f=G.fy;F(both([[f+1,f+3,G.fx0-1,38]]),(x,y)=>((x+y)&1)?c:lt(c));F(both([[f+4,f+4,G.fx0-1,38]]),dk(c))}}
+];
+
+/* ---------- 소품 ---------- */
+const HEADS=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'하이비스커스',s:'1210',d(G,c){P(['..PP.PP..','.PPPPPPP.','PPPPCPPPP','PPPCCCPPP','.PPPCPPP.','..PPPPP..','...P.P...'],47,11,{P:c,C:'#ffe066'});R(50,13,1,1,lt(c))}},
+ {n:'머리 위 선글라스',s:'1102',d(G,c){R(30,11,20,1,BK);RS(29,12,2,1,BK);RS(31,12,7,3,c);R(38,12,4,1,BK);RS(32,12,2,1,lt(c))}},
+ {n:'리본 머리띠',s:'0130',d(G,c){R(29,15,22,1,c);P(['XXX...XXX','XXXX.XXXX','XXXXDXXXX','XXXX.XXXX','XXX...XXX'],42,6,{X:c,D:dk(c)});R(43,7,1,1,lt(c))}},
+ {n:'반짝 헤어핀',s:'3010',d(G,c){const m={X:c,W:WH};P(['.X.','XWX','.X.'],31,18,m);P(['.X.','XWX','.X.'],35,16,m);P(['.X.','XWX','.X.'],45,19,m);R(30,22,5,1,'#ffcf4a')}},
+ {n:'왕리본',s:'0230',d(G,c){P(['XXXX.....XXXX','XXXXX...XXXXX','XXXXXXDXXXXXX','XXXXX.D.XXXXX','XXXX..D..XXXX','.....D.D.....'],34,2,{X:c,D:dk(c)})}},
+ {n:'꽃 화관',s:'1220',d(G,c){[[29,13],[34,11],[40,10],[46,11],[50,13]].forEach(([x,y],i)=>P(['.X.','XYX','.X.'],x,y,{X:i%2?WH:c,Y:'#ffe066'}));[[32,13],[38,11],[44,11],[49,15]].forEach(([x,y])=>R(x,y,2,1,'#5fbf7f'))}},
+ {n:'캡모자',s:'0103',d(G,c){R(31,7,18,1,c);R(29,8,22,6,c);R(22,13,20,3,dk(c));R(39,7,2,1,dk(c));R(32,9,4,1,lt(c))}},
+ {n:'반다나',s:'0112',d(G,c){R(28,12,24,5,c);[30,34,38,42,46].forEach(x=>R(x,14,1,1,WH));R(50,16,4,3,c);R(53,19,3,2,c)}},
+ {n:'고양이 귀',s:'0130',d(G,c){const m={X:c,P:'#ffb3cf'};P(['X...','XX..','XPX.','XPPX','XXXX'],28,6,m);P(['...X','..XX','.XPX','XPPX','XXXX'],48,6,m)}},
+ {n:'티아라',s:'2200',d(G,c){R(31,10,18,1,c);P(['...X...','..XXX..','.XXWXX.'],36,6,{X:c,W:'#7fd0ff'});RS(32,9,1,1,c)}},
+ {n:'나비 핀',s:'1120',d(G,c){[[30,15],[46,14],[44,19]].forEach(([x,y])=>P(['X.X','XXX','X.X'],x,y,{X:c}))}}
+];
+const EARS=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'후프',s:'2201',d(G,c,g){PS(['.XXX.','X...X','X...X','X...X','X...X','.XXX.'],g.earX-3,33,{X:c})}},
+ {n:'스터드',s:'1010',d(G,c,g){RS(g.earX,31,1,1,c);RS(g.earX,32,1,1,WH)}},
+ {n:'하트 드롭',s:'1120',d(G,c,g){RS(g.earX,31,1,3,c);PS(['X.X','XXX','.X.'],g.earX-1,34,{X:'#ff4fa3'})}},
+ {n:'진주 드롭',s:'1210',d(G,c,g){RS(g.earX,31,1,2,c);PS(['.X.','XWX','.X.'],g.earX-1,33,{X:'#f0e2ea',W:'#fff8ee'})}},
+ {n:'십자가',s:'0102',d(G,c,g){RS(g.earX,31,1,7,c);RS(g.earX-1,34,3,1,c)}},
+ {n:'별 드롭',s:'2100',d(G,c,g){RS(g.earX,31,1,3,c);PS(['.X.','XXX','.X.'],g.earX-1,34,{X:'#ffcf4a'})}}
+];
+const NECKS=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'초커',s:'0102',d(G,c){R(36,43,8,2,BK);R(39,45,2,2,c)}},
+ {n:'하트 펜던트',s:'1110',d(G,c){[[36,45],[37,46],[38,47],[41,47],[42,46],[43,45]].forEach(([x,y])=>R(x,y,1,1,c));P(['X.X','XXX','.X.'],38,48,{X:'#ff4fa3'})}},
+ {n:'진주',s:'1210',d(){[[35,45],[36,46],[37,47],[38,48],[40,48],[42,47],[43,46],[44,45]].forEach(([x,y],i)=>R(x,y,1,1,i%2?'#fff8ee':'#f0e2ea'))}},
+ {n:'체인',s:'1102',d(G,c){[[35,45],[36,46],[37,47],[38,48],[39,48],[40,48],[41,48],[42,47],[43,46],[44,45]].forEach(([x,y])=>R(x,y,1,1,c))}},
+ {n:'십자가',s:'0102',d(G,c){[[36,45],[37,46],[38,47],[41,47],[42,46],[43,45]].forEach(([x,y])=>R(x,y,1,1,c));R(39,48,2,5,c);R(38,49,4,1,c)}},
+ {n:'레이스 초커',s:'0121',d(G,c){R(35,43,10,2,c);[35,37,39,41,43].forEach(x=>R(x,45,1,1,c));R(39,43,2,2,'#ff4fa3')}}
+];
+const GLASSES=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'하트 선글라스',s:'2101',d(G,c){PS(['.XX.XX.','XXXXXXX','XXXXXXX','.XXXXX.','..XXX..','...X...'],30,24,{X:c});R(37,25,6,1,INK);PS(['X'],31,25,{X:lt(c)})}},
+ {n:'쉴드 선글라스',s:'1103',d(G,c){R(29,24,22,5,c);R(29,24,22,1,INK);R(30,25,20,1,lt(c));RS(28,25,1,2,INK)}},
+ {n:'동그란 안경',s:'0120',d(G,c){PS(['.XXXX.','X....X','X....X','X....X','.XXXX.'],31,24,{X:c});R(37,26,6,1,c)}},
+ {n:'나비 선글라스',s:'1210',d(G,c){PS(['XXX.XX','XXXXXX','.XXXXX','XXXXX.','XX....'],31,24,{X:c});R(37,26,6,1,INK)}},
+ {n:'별 안경',s:'2110',d(G,c){PS(['...X...','..XXX..','XXXXXXX','.XXXXX.','.XX.XX.'],30,23,{X:c});R(37,26,6,1,INK)}}
+];
+const HEART9=['.XXX.XXX.','XXHXXXXXX','XHXXXXXXX','XXXXXXXXX','.XXXXXXX.','..XXXXX..','...XXX...','....X....'];
+const HANDS=[
+ {n:'없음',s:'0000',d(){}},
+ {n:'데코폰',s:'3100',d(G,c,g){const x=G.hlx-4;F([[76,92,x,x+6]],(xx,y)=>(xx+y)%4===0?WH:c);R(x,84,7,1,dk(c));R(G.hlx,85,5,4,g.sk);R(x+1,93,1,4,'#ff4fa3');P(['X.X','XXX','.X.'],x-1,97,{X:'#ff4fa3'});R(x+2,95,2,2,'#ffcf4a')}},
+ {n:'폴더폰',s:'1101',d(G,c,g){const x=G.hrx+1;R(x,70,6,9,c);R(x+1,71,4,6,'#9fe3ff');R(x,79,6,1,dk(c));R(x,80,6,8,c);R(x+5,64,1,6,BK);[[x+1,82],[x+3,82],[x+1,84],[x+3,84]].forEach(([a,b])=>R(a,b,1,1,lt(c)));R(G.hrx,85,5,4,g.sk)}},
+ {n:'곰인형',s:'0030',d(G,c,g){const o=G.hrx-52,m=lt(c);R(55+o,82,2,2,c);R(62+o,82,2,2,c);R(54+o,84,10,7,c);R(53+o,91,12,10,c);R(52+o,93,2,5,c);R(65+o,93,2,5,c);R(54+o,101,4,3,c);R(60+o,101,4,3,c);R(57+o,88,4,2,m);R(56+o,86,1,1,INK);R(61+o,86,1,1,INK);R(58+o,88,2,1,INK);R(56+o,94,6,5,m);R(57+o,91,4,1,'#ff4fa3');R(G.hrx,86,5,4,g.sk)}},
+ {n:'하트 미니백',s:'1120',d(G,c){const d=dk(c);for(let t=0;t<=1;t+=1/40)R(Math.round(50-23*t),Math.round(47+28*t),1,1,d);P(HEART9,G.hlx-4,74,{X:c,H:lt(c)});R(G.hlx,76,1,1,'#ffcf4a')}},
+ {n:'버블티',s:'0120',d(G,c,g){const o=G.hrx-52;R(57+o,72,1,9,'#ff4fa3');R(52+o,80,8,1,WH);F([[81,93,53+o,58+o]],(x,y)=>(y>=89&&((x+y)&1)===0)?'#3b2a20':c);R(54+o,82,1,7,lt(c));R(G.hrx,86,5,4,g.sk)}},
+ {n:'프리쿠라 수첩',s:'1120',d(G,c,g){const x=G.hlx-5;R(x,78,9,12,c);R(x,78,1,12,dk(c));[[x+2,80,'#ff4fa3'],[x+5,80,'#7fd0ff'],[x+2,84,'#ffcf4a'],[x+5,84,'#9fe3c9']].forEach(([a,b,k])=>R(a,b,3,3,k));R(G.hlx,85,5,4,g.sk)}},
+ {n:'손거울',s:'1120',d(G,c,g){P(['.XXXX.','XMMMMX','XMWMMX','XMMMMX','.XXXX.','..XX..','..XX..','..XX..'],G.hrx,74,{X:c,M:'#dff4ff',W:WH});R(G.hrx,85,5,4,g.sk)}},
+ {n:'토끼 인형',s:'0030',d(G,c,g){const x=G.hrx+1;R(x+1,76,2,7,c);R(x+6,76,2,7,c);R(x+2,78,1,4,'#ffb3cf');R(x+7,78,1,4,'#ffb3cf');R(x,83,10,7,c);R(x-1,90,12,10,c);R(x+2,86,1,1,INK);R(x+7,86,1,1,INK);R(x+4,87,2,1,'#ff8fb1');R(x+3,93,6,5,lt(c));R(G.hrx,86,5,4,g.sk)}},
+ {n:'쇼핑백',s:'1110',d(G,c,g){const x=G.hlx-6;R(x+2,80,1,5,BK);R(x+7,80,1,5,BK);R(x+2,80,6,1,BK);R(x,85,10,13,c);P(['X.X','XXX','.X.'],x+3,89,{X:ink2(c)});R(G.hlx,85,5,4,g.sk)}}
+];
+const NAILS=[{n:'짧게',s:'0010'},{n:'보통',s:'0110'},{n:'길게',s:'1210'},{n:'롱롱 네일',s:'2301'},{n:'스틸레토',s:'2202'}];
+
+/* ---------- 배경 ---------- */
+const BGS=[
+ {n:'프리쿠라',s:'2010',base:'#ffd1e6',d(){R(0,0,W,H,'#ffd1e6');R(0,138,W,12,'#ffbcd9');[[8,14],[64,30],[10,70],[66,96],[6,112],[60,8]].forEach(([x,y])=>P(['X.X','XXX','.X.'],x,y,{X:'#ff9ec7'}));[[18,40],[58,58],[14,96],[70,124],[36,4]].forEach(([x,y])=>P(['.X.','XXX','.X.'],x,y,{X:WH}));R(0,0,W,2,WH);R(0,H-2,W,2,WH);R(0,0,2,H,WH);R(W-2,0,2,H,WH);for(let i=4;i<W-4;i+=4){R(i,3,2,1,'#ff9ec7');R(i,H-4,2,1,'#ff9ec7')}}},
+ {n:'시부야 밤',s:'1102',base:'#1b1838',d(){R(0,0,W,H,'#1b1838');[[0,40,15],[14,22,14],[27,52,12],[38,30,16],[53,46,12],[64,18,16]].forEach(([x,y,w])=>{R(x,y,w,132-y,'#2c2850');for(let yy=y+4;yy<128;yy+=5)for(let xx=x+2;xx<x+w-1;xx+=4)R(xx,yy,2,2,((xx*yy)%7<3)?'#ffe680':'#3a3566')});R(16,30,10,3,'#ff4fa3');R(56,56,8,3,'#5ff0ff');R(40,38,2,14,'#ff4fa3');R(3,48,8,2,'#5ff0ff');R(0,132,W,18,'#3a3560');for(let x=2;x<W;x+=8)R(x,141,5,5,'#cfcbe6')}},
+ {n:'해변',s:'1110',base:'#a6e4ff',d(){['#7fd4ff','#93dcff','#a6e4ff','#bdebff','#cdf1ff','#ddf6ff'].forEach((k,i)=>R(0,i*16,W,16,k));R(56,14,10,10,'#fff3a0');R(58,12,6,14,'#fff3a0');R(0,96,W,18,'#3fb8d9');for(let x=0;x<W;x+=10){R(x,99,5,1,WH);R(x+5,106,4,1,'#bdeaf5')}R(0,114,W,36,'#f3dca6');for(let i=0;i<24;i++)R((i*37)%W,116+((i*23)%32),1,1,'#e2c58a')}},
+ {n:'레오파드',s:'0202',base:'#e8b46a',d(){R(0,0,W,H,'#e8b46a');for(let y=0;y<H;y+=12)for(let x=((y/12)%2)*6-6;x<W;x+=12)P(['.KK.','KCCK','.KK.'],x,y,{K:'#3b2a20',C:'#c98f45'})}},
+ {n:'하트 체크',s:'1020',base:'#ff4fa3',d(){for(let y=0;y<H;y+=10)for(let x=0;x<W;x+=10){const p=((x+y)/10)%2;R(x,y,10,10,p?'#ff4fa3':'#ffd1e6');if(p)P(['X.X','XXX','.X.'],x+3,y+3,{X:'#ffd1e6'})}}},
+ {n:'교실',s:'0120',base:'#e9eedb',d(){R(0,0,W,H,'#e9eedb');R(0,0,W,10,'#d9dfc6');R(5,18,70,30,'#8a5a3a');R(7,20,66,26,'#2f5a3e');P(['.X.X.','XXXXX','.XXX.','..X..'],12,26,{X:'#ffd1e6'});R(26,28,18,1,'#e8f0e8');R(26,32,12,1,'#e8f0e8');R(26,36,20,1,'#e8f0e8');R(56,24,10,10,'#e8f0e8');R(57,25,8,8,'#2f5a3e');R(0,126,W,24,'#c9a070');for(let y=130;y<H;y+=5)R(0,y,W,1,'#b38a5e');R(58,100,22,4,'#a87850');R(60,104,2,22,'#7a5236');R(76,104,2,22,'#7a5236')}},
+ {n:'노래방',s:'2101',base:'#2a1640',d(){R(0,0,W,H,'#2a1640');X.fillStyle='rgba(255,79,163,.18)';X.beginPath();X.moveTo(40,10);X.lineTo(0,128);X.lineTo(26,128);X.fill();X.fillStyle='rgba(95,240,255,.16)';X.beginPath();X.moveTo(40,10);X.lineTo(54,128);X.lineTo(80,128);X.fill();P(['..XXX..','.XWXWX.','XWXWXWX','XXWXWXX','.XWXWX.','..XXX..'],37,2,{X:'#c8c8dc',W:WH});[[10,30,'#ff4fa3'],[66,40,'#5ff0ff'],[20,70,'#ffe680'],[60,80,'#ff4fa3'],[8,100,'#5ff0ff'],[70,110,'#ffe680']].forEach(([x,y,k])=>R(x,y,2,2,k));R(0,128,W,22,'#3a2058');R(0,128,W,1,'#ff4fa3')}},
+ {n:'핑크 침실',s:'0130',base:'#ffd6e8',d(){R(0,0,W,100,'#ffd6e8');for(let x=0;x<W;x+=6)R(x,0,3,100,'#ffc6df');R(6,16,20,18,WH);R(8,18,7,14,'#bfe6ff');R(17,18,7,14,'#bfe6ff');R(0,100,W,50,'#f2c9a0');for(let y=104;y<H;y+=5)R(0,y,W,1,'#e2b48a');R(52,82,28,30,WH);R(52,92,28,20,'#ff8fc1');R(52,92,28,2,'#ffb3d4');P(['.XX.XX.','XXXXXXX','.XXXXX.','..XXX..','...X...'],60,84,{X:'#ff4fa3'})}},
+ {n:'지브라',s:'0202',base:'#f4f2f6',d(){for(let y=0;y<H;y++)for(let x=0;x<W;x++)R(x,y,1,1,(((x+(y>>1)+Math.round(Math.sin(y/6)*3))%10+10)%10<4)?'#1d1a22':'#f4f2f6')}},
+ {n:'별밤',s:'2010',base:'#251a52',d(){['#1b1240','#251a52','#2f2264','#3a2c74','#46348a'].forEach((k,i)=>R(0,i*30,W,30,k));[[6,8],[20,24],[34,6],[66,18],[12,50],[58,44],[44,70],[24,92],[70,86],[8,118]].forEach(([x,y],i)=>{R(x,y,1,1,WH);if(i%3===0){R(x-1,y,3,1,'#fff7c2');R(x,y-1,1,3,'#fff7c2')}});R(54,10,10,10,'#ffe680');R(57,8,9,9,'#1b1240');R(0,134,W,16,'#2a1f5a')}}
+];
+
+/* ---------- 카테고리 ---------- */
+const CATS={
+ face:{lbl:'얼굴형',items:FACES,crop:[22,10,36,36]},
+ eyes:{lbl:'눈',items:EYES,crop:[28,20,24,14],sw:[{lbl:'렌즈',key:'lensC',pal:LENS}]},
+ brows:{lbl:'눈썹',items:BROWS,crop:[28,18,24,10]},
+ nose:{lbl:'코',items:NOSES,crop:[33,27,14,11]},
+ mouth:{lbl:'입',items:MOUTHS,crop:[33,33,14,9],sw:[{lbl:'립',key:'lipC',pal:LIP}]},
+ makeup:{lbl:'화장',items:MAKEUP,crop:[26,18,28,22]},
+ skin:{lbl:'피부',items:SKINS,crop:[24,12,32,34]},
+ body:{lbl:'체형',items:BODY,crop:[6,38,68,106]},
+ hair:{lbl:'헤어',items:HAIRS,crop:[8,0,64,100],sw:[{key:'hairC',pal:HAIRC}]},
+ bangs:{lbl:'앞머리',items:BANGS,crop:[24,8,32,26],sw:[{key:'hairC',pal:HAIRC}]},
+ top:{lbl:'상의',items:TOPS,crop:[12,38,56,62],sw:[{key:'topC',pal:CL}]},
+ bottom:{lbl:'하의',items:BOTTOMS,crop:[12,64,56,80],sw:[{key:'bottomC',pal:CL}]},
+ socks:{lbl:'양말',items:SOCKS,crop:[18,76,44,70],sw:[{key:'socksC',pal:CL}]},
+ shoes:{lbl:'신발',items:SHOES,crop:[18,96,44,50],sw:[{key:'shoesC',pal:CL}]},
+ head:{lbl:'머리장식',items:HEADS,crop:[18,0,46,36],sw:[{key:'headC',pal:CL}]},
+ ear:{lbl:'귀걸이',items:EARS,crop:[20,24,40,22],sw:[{key:'earC',pal:MET}]},
+ neck:{lbl:'목걸이',items:NECKS,crop:[28,38,24,18],sw:[{key:'neckC',pal:MET}]},
+ glass:{lbl:'안경',items:GLASSES,crop:[24,18,32,18],sw:[{key:'glassC',pal:CL}]},
+ hand:{lbl:'손',items:HANDS,crop:[6,60,68,48],sw:[{key:'handC',pal:CL}]},
+ nail:{lbl:'네일',items:NAILS,nail:1,sw:[{lbl:'아트',key:'nailArt',chips:NAILART},{lbl:'컬러',key:'nailC',pal:NAILC}]},
+ bg:{lbl:'배경',items:BGS,crop:[0,0,80,150]}
+};
+const GROUPS=[['얼굴',['face','eyes','brows','nose','mouth','makeup','skin','body']],['헤어',['hair','bangs']],['옷',['top','bottom','socks','shoes']],['소품',['head','ear','neck','glass','hand','nail']],['배경',['bg']]];
+
+const S0={face:0,eyes:1,lensC:0,brows:2,nose:4,mouth:4,lipC:0,makeup:2,skin:2,body:0,hair:0,hairC:0,bangs:0,top:0,topC:0,bottom:1,bottomC:7,socks:1,socksC:1,shoes:0,shoesC:0,head:4,headC:5,ear:1,earC:0,neck:0,neckC:0,glass:0,glassC:0,hand:1,handC:2,nail:2,nailC:0,nailArt:3,bg:0};
+let S=Object.assign({},S0),cg=0,cur='face',sfx=true;const lastSub=GROUPS.map(g=>g[1][0]);
+try{const v=JSON.parse(localStorage.getItem('galdeco3')||'null');if(v){S=Object.assign({},S0,v.S);sfx=v.sfx!==false}}catch(e){}
+if(window.claude?.hot?.data?.S)S=Object.assign({},S0,window.claude.hot.data.S);
+Object.keys(CATS).forEach(k=>{if(!(S[k]>=0&&S[k]<CATS[k].items.length))S[k]=S0[k]});
+function save(){try{localStorage.setItem('galdeco3',JSON.stringify({S,sfx}))}catch(e){}}
+window.claude?.hot?.snapshot?.(()=>({S}));
+
+/* ---------- 렌더 ---------- */
+const L=document.createElement('canvas');L.width=W;L.height=H;const lx=L.getContext('2d');
+function outline(ctx,w,h){const im=ctx.getImageData(0,0,w,h),a=im.data,o=new Uint8ClampedArray(a);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(a[i+3])continue;
+  if((x>0&&a[i-1])||(x<w-1&&a[i+7])||(y>0&&a[i-w*4+3])||(y<h-1&&a[i+w*4+3])){o[i]=42;o[i+1]=24;o[i+2]=48;o[i+3]=255}}
+ im.data.set(o);ctx.putImageData(im,0,0)}
+function body(G,g,s){const sk=g.sk,sd=g.sd,a=G.au;
+ R(37,40,6,7,sk);
+ for(let y=46;y<=77;y++){const h=G.tor[y];R(40-h,y,2*h,1,sk)}
+ RS(33,48,3,1,sd);R(39,66,2,1,sd);
+ RS(a,48,4,19,sk);RS(a-1,67,4,18,sk);RS(a+3,49,1,16,sd);RS(G.hlx,85,5,6,sk);RS(G.hlx,90,4,1,sd);
+ for(const y in G.leg){const [x0,x1]=G.leg[y];RS(x0,+y,x1-x0+1,1,sk)}
+ RS(38,82,1,14,sd);const kr=G.leg[G.knee+2];RS(kr[0]+2,G.knee+2,3,1,sd);
+ RS(G.fx0+1,G.fy,6,4,sk);RS(G.fx0,G.fy+2,1,2,sk);
+ const nc=NAILC[s.nailC],Ln=[0,1,1,2,3][s.nail],tip=s.nailArt===1?WH:nc;
+ [1,3].forEach(o=>{RS(G.hlx+o,90,1,1+Ln,nc);RS(G.hlx+o,90+Ln,1,1,tip)});
+}
+function drawChar(s){
+ X=lx;lx.clearRect(0,0,W,H);
+ const G=geom(BODY[s.body]),sk=SKIN[s.skin],hc=HAIRC[s.hairC],fh=faceRows(FACES[s.face].r);
+ const mk=MAKEUP[s.makeup];
+ const g={sk,sd:shade(sk,-32),sh:shade(sk,24),hc,hd:shade(hc,-45),hh:shade(hc,40),lens:LENS[s.lensC],lip:mk.lip||LIP[s.lipC],fh,earX:40-fh[30]-1};
+ const hair=HAIRS[s.hair],top=TOPS[s.top];
+ hair.b(g);body(G,g,s);
+ SOCKS[s.socks].d(G,CL[s.socksC],g);
+ SHOES[s.shoes].d(G,CL[s.shoesC],g);
+ if(!top.one)BOTTOMS[s.bottom].d(G,CL[s.bottomC],g);
+ top.d(G,CL[s.topC],g);
+ NECKS[s.neck].d(G,MET[s.neckC],g);
+ let last=0;for(const y in fh){R(40-fh[y],+y,2*fh[y],1,sk);last=Math.max(last,+y)}RS(g.earX,27,1,5,sk);R(37,last+1,6,1,g.sd);
+ mk.pre&&mk.pre(g);
+ const br=BROWS[s.brows];PS(br.r,31,br.y,{B:br.bleach?shade(hc,50):shade(hc,-70)});
+ const ey=EYES[s.eyes],em=Object.assign({K:INK,W:'#f6f1f6',H:WH,I:g.lens,D:shade(g.lens,-55),L:g.sd,N:'#fff4f8'},ey.map||{});
+ if(ey.wink){P(ey.r,31,ey.y,em);R(43,27,5,1,INK);R(48,26,1,1,INK);R(44,28,1,1,INK);R(46,28,1,1,INK)}else PS(ey.r,31,ey.y,em);
+ const no=NOSES[s.nose];P(no.r,38,no.y,{s:g.sd,h:g.sh});
+ const mo=MOUTHS[s.mouth];P(mo.r,36,mo.y,{L:g.lip,l:lt(g.lip),T:WH,D:'#7a1f3a',U:'#ff8fa3',K:INK});
+ mk.post&&mk.post(g);
+ crown(g);hair.f(g);BANGS[s.bangs].d(g);
+ EARS[s.ear].d(G,MET[s.earC],g);
+ GLASSES[s.glass].d(G,CL[s.glassC],g);
+ HEADS[s.head].d(G,CL[s.headC],g);
+ HANDS[s.hand].d(G,CL[s.handC],g);
+ outline(lx,W,H);
+}
+function renderTo(ctx,s,noBg){
+ drawChar(s);ctx.clearRect(0,0,W,H);
+ if(!noBg){X=ctx;BGS[s.bg].d();const fy=geom(BODY[s.body]).fy;ctx.fillStyle='rgba(42,24,48,.22)';ctx.fillRect(24,fy+6,32,3)}
+ ctx.drawImage(L,0,0);
+}
+function nailHand(ctx,len,c,art,sk){
+ X=ctx;ctx.clearRect(0,0,32,32);const sd=shade(sk,-30);
+ R(8,19,17,12,sk);R(3,21,5,6,sk);R(2,23,2,3,sk);
+ const fx=[8,12,16,21],ft=[11,9,10,13],fw=[4,4,4,3],ext=[0,1,3,5,7][len];
+ fx.forEach((x,i)=>{R(x,ft[i],fw[i],20-ft[i],sk);R(x+fw[i]-1,ft[i]+2,1,18-ft[i],sd)});
+ fx.forEach((x,i)=>{const w=fw[i],top=ft[i]-ext,hgt=ft[i]+2-top+1;
+  for(let y=top;y<=ft[i]+2;y++){let x0=x,x1=x+w-1;if(len===4&&y<ft[i]){const k=ft[i]-y;if(k>2){x0=x+1;x1=x+w-2}if(k>5){x0=x1=x+1}}
+   for(let xx=x0;xx<=x1;xx++){const rel=y-top;let col=c;
+    if(art===1&&rel<Math.max(1,Math.ceil(hgt/3)))col=WH;
+    if(art===2&&rel>=hgt/2)col=lt(c);
+    if(art===3&&((xx+y)%3===0))col=WH;
+    if(art===4&&rel===Math.max(0,Math.floor(hgt/2)-1)&&xx===x+1)col=ink2(c);
+    R(xx,y,1,1,col)}}});
+ R(2,23,2,2,c);outline(ctx,32,32);
+}
+const view=document.getElementById('view'),vx=view.getContext('2d');
+const nv=document.getElementById('nailview').getContext('2d');
+const T=document.createElement('canvas');T.width=W;T.height=H;const tx=T.getContext('2d');
+
+/* ---------- 점수 ---------- */
+function judge(s){
+ const t=[0,0,0,0],add=str=>[...str].forEach((d,i)=>t[i]+=+d);
+ Object.keys(CATS).forEach(k=>add(CATS[k].items[s[k]].s));add(HAIRB[s.hairC]);add(ARTB[s.nailArt]);
+ const nm=k=>CATS[k].items[s[k]].n,combos=[];
+ if(nm('makeup')==='강구로'&&s.skin>=6)combos.push(['강구로 완성',8,'g']);
+ if(nm('socks')==='루즈삭스'&&['카디건 교복','니트 베스트','세일러 교복'].includes(nm('top'))&&['플리츠 미니','체크 미니'].includes(nm('bottom')))combos.push(['정석 코갸루 세트',8,'k']);
+ if(nm('head')==='하이비스커스'&&nm('bg')==='해변')combos.push(['썸머 갸루',6,'s']);
+ if(nm('top')==='벨벳 츄리닝'&&['츄리닝 바지','플레어 진'].includes(nm('bottom')))combos.push(['Y2K 츄리닝 룩',6,'y']);
+ if(nm('hand')==='데코폰'&&s.nail>=2&&s.nailArt===3)combos.push(['데코 마스터',5,'d']);
+ if([nm('top'),TOPS[s.top].one?'':nm('bottom'),nm('bg')].filter(n=>n.includes('레오파드')).length>=2)combos.push(['풀 레오파드',5,'l']);
+ if(s.nail>=3&&s.nailArt>0)combos.push(['네일 장인',4,'n']);
+ if(BG.on)combos.push(['BGM 켜고 꾸미기',3,'p']);
+ const tot=t.reduce((a,b)=>a+b,0),bonus=combos.reduce((a,c)=>a+c[1],0);
+ return {t,score:Math.min(100,Math.round(tot*0.95+bonus)),combos};
+}
+const RANKS={
+ g:['레전드 강구로','진한 태닝에 하얀 메이크까지 완벽해요. 2000년 시부야 센터가이에 서 있어도 위화감 제로!'],
+ k:['정석 코갸루','루즈삭스, 미니, 교복 레이어드까지. 교과서에 실릴 법한 코갸루 그 자체예요.'],
+ s:['썸머 갸루','하이비스커스에 바다라니, 여름 갸루 완성! 태닝 오일 챙겼죠?'],
+ y:['Y2K 츄리닝 갸루','벨벳 츄리닝에 와이드 하의, 2000년대 감성 그대로예요.'],
+ 0:['키라키라 데코 갸루','반짝임 과다 주의! 프리쿠라 기계가 눈부셔서 고장날 수준이에요.'],
+ 1:['모리모리 오네갸루','머리부터 발끝까지 풀 장착. 갸루 잡지 표지감이에요.'],
+ 2:['달달 아마갸루','귀여움 몰빵 코디! 핑크와 리본이 아주 사랑스러워요.'],
+ 3:['카리스마 록갸루','센 언니 분위기 최고예요. 사진 찍을 땐 갸루 피스 잊지 마요!']
+};
+const TIPS=['헤어핀, 데코폰, 글리터 네일로 반짝임을 올려 봐요.','볼륨 헤어나 통굽 부츠로 더 화려하게 꾸며 봐요.','리본이나 곰인형으로 귀여움을 한 스푼 더해요.','레오파드, 지브라, 태닝 피부로 강렬함을 채워 봐요.'];
+const STL=['반짝','화려','귀염','강렬'];
+
+/* ---------- 사운드 ---------- */
+let AC=null;
+function getAC(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function beep(f,len=.07){if(!sfx)return;const ac=getAC();if(!ac)return;try{const o=ac.createOscillator(),gn=ac.createGain();o.type='square';o.frequency.value=f;gn.gain.value=.04;gn.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+len);o.connect(gn).connect(ac.destination);o.start();o.stop(ac.currentTime+len)}catch(e){}}
+
+/* 오리지널 Y2K 시부야 팝 루프 — 112BPM, Fmaj7-Em7-Dm7-C */
+const BG={on:false,timer:null,step:0,next:0,out:null,noise:null,was:false};
+const M=n=>440*Math.pow(2,(n-69)/12);
+function bgInit(){const ac=getAC();if(!ac||BG.out)return;const comp=ac.createDynamicsCompressor();comp.threshold.value=-16;comp.ratio.value=4;const g=ac.createGain();g.gain.value=.26;g.connect(comp).connect(ac.destination);BG.out=g;const len=ac.sampleRate;const buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;BG.noise=buf}
+function env(g,t,a,p,dec){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(p,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+dec)}
+function kick(t){const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(160,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);env(g,t,.002,.9,.16);o.connect(g).connect(BG.out);o.start(t);o.stop(t+.22)}
+function hit(t,type,freq,p,dec){const s=AC.createBufferSource();s.buffer=BG.noise;const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();env(g,t,.001,p,dec);s.connect(f).connect(g).connect(BG.out);s.start(t,Math.random()*.5);s.stop(t+dec+.05)}
+function tone(t,m,type,p,dec,cut,det){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=M(m);if(det)o.detune.value=det;let n=o;if(cut){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=cut;f.Q.value=3;o.connect(f);n=f}env(g,t,.004,p,dec);n.connect(g).connect(BG.out);o.start(t);o.stop(t+dec+.06)}
+const CH=[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,62]],ROOT=[41,40,38,36];
+const MEL=[[72,0,76,0,79,0,0,0,77,0,76,0,0,0,0,0],[74,0,76,0,79,0,0,0,83,0,81,0,79,0,0,0],[77,0,76,0,74,0,0,0,72,0,74,0,76,0,0,0],[79,0,0,0,76,0,0,0,74,0,72,0,0,0,0,0]];
+const MEL2=[[84,0,0,0,83,0,81,0,79,0,0,0,76,0,0,0],[79,0,0,0,83,0,0,0,86,0,84,0,83,0,0,0],[81,0,79,0,77,0,0,0,76,0,77,0,81,0,0,0],[79,0,0,0,0,0,0,0,76,0,79,0,84,0,0,0]];
+function bgStep(st,t){const bar=(st>>4)&7,s=st&15,ci=bar&3,B=bar>=4;
+ if(s===0||s===8||(s===10&&ci===3))kick(t);
+ if(s===4||s===12)hit(t,'bandpass',2200,.14,.1);
+ if(s%4===2)hit(t,'highpass',8000,.06,.04);
+ if(s===0||s===8)tone(t,ROOT[ci],'triangle',.3,.32,0);
+ if(s===6||s===14)tone(t,ROOT[ci]+12,'triangle',.18,.14,0);
+ if(s===0)CH[ci].forEach(n=>{tone(t,n,'sine',.05,.6);tone(t,n+12,'triangle',.015,.4)});
+ if(s===7)CH[ci].forEach(n=>tone(t,n+12,'sine',.03,.22));
+ const mel=(B?MEL2:MEL)[ci][s];if(mel){tone(t,mel,'sine',.09,.38);tone(t,mel+19,'sine',.02,.22)}
+ if(ci===3&&s===15)[96,100,103].forEach((n,i)=>tone(t+i*.04,n,'triangle',.02,.12));
+}
+function bgSched(){const sp=60/112/4;while(BG.next<AC.currentTime+.12){bgStep(BG.step,BG.next);BG.next+=sp;BG.step=(BG.step+1)&127}}
+function bgOn(){bgInit();if(!BG.out)return;BG.on=true;BG.step=0;BG.next=AC.currentTime+.06;clearInterval(BG.timer);BG.timer=setInterval(bgSched,25);syncBgm()}
+function bgOff(){BG.on=false;clearInterval(BG.timer);syncBgm()}
+const bgmBtn=document.getElementById('bgm');
+function syncBgm(){bgmBtn.setAttribute('aria-pressed',BG.on);bgmBtn.textContent=BG.on?'♫ BGM ON':'♫ BGM';document.getElementById('live').textContent=String(judge(S).score).padStart(2,'0')}
+bgmBtn.onclick=()=>{BG.on?bgOff():bgOn()};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&BG.on){BG.was=true;bgOff()}else if(!document.hidden&&BG.was){BG.was=false;bgOn()}});
+
+/* ---------- UI ---------- */
+const groupsEl=document.getElementById('groups'),subsEl=document.getElementById('subs'),itemsEl=document.getElementById('items'),swEl=document.getElementById('sw');
+GROUPS.forEach((gr,i)=>{const b=document.createElement('button');b.className='grp';b.setAttribute('role','tab');b.id='grp-'+i;b.textContent=gr[0];b.onclick=()=>{cg=i;cur=lastSub[i];beep(620);ui(true)};groupsEl.appendChild(b)});
+
+function thumb(cat,k,i){
+ if(cat.nail){const cv=document.createElement('canvas');cv.width=32;cv.height=32;nailHand(cv.getContext('2d'),i,NAILC[S.nailC],S.nailArt,SKIN[S.skin]);return cv}
+ const [x,y,w,h]=cat.crop,cv=document.createElement('canvas');cv.width=w;cv.height=h;
+ renderTo(tx,Object.assign({},S,{[k]:i},(k==='face'||k==='skin')?{hair:10,bangs:5,ear:0,glass:0,head:0}:{}),k!=='bg');cv.getContext('2d').drawImage(T,x,y,w,h,0,0,w,h);return cv;
+}
+function ui(reset){
+ const cat=CATS[cur];
+ [...groupsEl.children].forEach((b,i)=>b.setAttribute('aria-selected',i===cg));
+ subsEl.innerHTML='';
+ GROUPS[cg][1].forEach(k=>{const b=document.createElement('button');b.className='sub';b.id='sub-'+k;b.textContent=CATS[k].lbl;b.setAttribute('aria-pressed',k===cur);b.onclick=()=>{cur=k;lastSub[cg]=k;beep(740);ui(true)};subsEl.appendChild(b)});
+ document.getElementById('cap').textContent=cat.items[S[cur]].n;
+ document.getElementById('capn').textContent=(S[cur]+1)+' / '+cat.items.length+(cat.items.length>5?' · 옆으로 넘겨 보기':'');
+ const keep=reset?null:itemsEl.scrollLeft;
+ itemsEl.innerHTML='';
+ cat.items.forEach((it,i)=>{
+  const b=document.createElement('button');b.className='it';b.id='it-'+cur+'-'+i;b.setAttribute('aria-pressed',S[cur]===i);b.setAttribute('aria-label',it.n);b.title=it.n;
+  if(it.n==='없음'){b.classList.add('empty');b.textContent='없음'}else b.appendChild(thumb(cat,cur,i));
+  b.onclick=()=>{S[cur]=i;beep(880);draw();ui()};itemsEl.appendChild(b);
+ });
+ if(keep!=null)itemsEl.scrollLeft=keep;else{const sel=itemsEl.children[S[cur]];itemsEl.scrollLeft=sel?Math.max(0,sel.offsetLeft-itemsEl.offsetLeft-itemsEl.clientWidth/2+30):0}
+ const swKeep=reset?0:swEl.scrollLeft;swEl.innerHTML='';
+ (cat.sw||[]).forEach(grp=>{
+  if(grp.lbl){const l=document.createElement('span');l.className='lbl';l.textContent=grp.lbl;swEl.appendChild(l)}
+  if(grp.chips)grp.chips.forEach((t,i)=>{const b=document.createElement('button');b.className='chip';b.id='chip-'+grp.key+'-'+i;b.textContent=t;b.setAttribute('aria-pressed',S[grp.key]===i);b.onclick=()=>{S[grp.key]=i;beep(990);draw();ui()};swEl.appendChild(b)});
+  else grp.pal.forEach((col,i)=>{const b=document.createElement('button');b.className='dot';b.id='sw-'+grp.key+'-'+i;b.style.background=col;b.setAttribute('aria-label',(grp.lbl||cat.lbl)+' 색 '+(i+1));b.setAttribute('aria-pressed',S[grp.key]===i);b.onclick=()=>{S[grp.key]=i;beep(990);draw();ui()};swEl.appendChild(b)});
+ });
+ if(!cat.sw){const l=document.createElement('span');l.className='lbl';l.textContent=cur==='bg'?'사진 찍을 장소를 골라요':cur==='skin'?'원하는 피부 톤을 골라요':'모양을 골라 내 얼굴을 만들어요';swEl.appendChild(l)}
+ swEl.scrollLeft=swKeep;
+ document.getElementById('nailbox').hidden=cur!=='nail';
+}
+function draw(){
+ renderTo(vx,S);
+ document.getElementById('stage').style.background=BGS[S.bg].base;
+ nailHand(nv,S.nail,NAILC[S.nailC],S.nailArt,SKIN[S.skin]);
+ document.getElementById('live').textContent=String(judge(S).score).padStart(2,'0');
+ save();
+}
+
+const sb=document.getElementById('snd');const sl=()=>{sb.setAttribute('aria-pressed',sfx);sb.textContent=sfx?'효과음':'효과음 끔'};sl();
+sb.onclick=()=>{sfx=!sfx;sl();save();beep(700)};
+const ri=n=>Math.floor(Math.random()*n);
+document.getElementById('rnd').onclick=()=>{
+ Object.keys(CATS).forEach(k=>{const c=CATS[k];S[k]=ri(c.items.length);(c.sw||[]).forEach(gp=>S[gp.key]=ri((gp.pal||gp.chips).length))});
+ [523,659,784].forEach((f,i)=>setTimeout(()=>beep(f),i*60));draw();ui();
+};
+
+const modal=document.getElementById('modal');
+document.getElementById('done').onclick=()=>{
+ renderTo(vx,S);
+ const big=document.createElement('canvas');big.width=W*4;big.height=H*4;const bx=big.getContext('2d');bx.imageSmoothingEnabled=false;bx.drawImage(view,0,0,big.width,big.height);
+ document.getElementById('shot').src=big.toDataURL('image/png');
+ const j=judge(S),top=j.combos.find(c=>'gksy'.includes(c[2]));
+ let dom=0,low=0;j.t.forEach((v,i)=>{if(v>j.t[dom])dom=i;if(v<j.t[low])low=i});
+ const rk=RANKS[top?top[2]:dom];
+ document.getElementById('rank').textContent=rk[0];
+ document.getElementById('cmt').textContent=rk[1];
+ document.getElementById('tip').textContent=j.score>=97?'더 고칠 게 없어요. 이대로 프리쿠라 찍으러 가요!':'다음엔 '+TIPS[low];
+ document.getElementById('grade').textContent=j.score>=90?'S':j.score>=80?'A':j.score>=68?'B':'C';
+ const st=document.getElementById('stats');st.innerHTML='';
+ j.t.forEach((v,i)=>{const r=document.createElement('div');r.className='st';r.innerHTML='<span>'+STL[i]+'</span><div class="track"><i style="width:0%"></i></div>';st.appendChild(r);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{r.querySelector('i').style.width=Math.min(100,v*100/28)+'%'}))});
+ const cb=document.getElementById('combos');cb.innerHTML='';
+ j.combos.forEach(c=>{const s=document.createElement('span');s.textContent='★ '+c[0]+' +'+c[1];cb.appendChild(s)});
+ cb.hidden=!j.combos.length;
+ const sc=document.getElementById('score');
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches)sc.textContent=j.score;else{let n=0;const tm=setInterval(()=>{n=Math.min(j.score,n+4);sc.textContent=n;if(n>=j.score)clearInterval(tm)},25)}
+ modal.hidden=false;[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*100));
+ document.getElementById('again').focus();
+};
+const close=()=>{modal.hidden=true;beep(520)};
+document.getElementById('again').onclick=close;
+modal.onclick=e=>{if(e.target===modal)close()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
+
+function start(){draw();ui(true)}
+window.claude?.hot?.ready?window.claude.hot.ready(start):start();
+})();
+</script>
